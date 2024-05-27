@@ -13,7 +13,13 @@ const db = new sqlite3.Database('database.db', (err) => {
       cidade TEXT,
       estado TEXT,
       carroSelecionado TEXT
-    )`);
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela:', err.message);
+      } else {
+        console.log('Tabela purchases criada ou já existe.');
+      }
+    });
   }
 });
 

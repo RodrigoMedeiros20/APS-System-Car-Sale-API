@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(helmet()); // Adicione o Helmet para ajudar a definir cabeçalhos de segurança
+app.use(helmet());
 
 // Configure CSP para permitir recursos externos, como fontes do Google
 app.use(
@@ -46,5 +46,5 @@ app.post('/purchase', (req, res) => {
 
 // Iniciando o servidor
 app.listen(port, () => {
-  console.log('Server running at http://localhost:3001/');
+  console.log(`Server running at http://localhost:${port}/`);
 });
