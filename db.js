@@ -1,27 +1,23 @@
-const { Client } = require('postgres');
+require('dotenv').config();
+const postgres = require('postgres');
 
-// Configurações de conexão com o PostgreSQL
-const client = new Client({
-  user: process.env.PGUSER,
+// Configurações de conexão com o PostgreSQL usando variáveis de ambiente
+const sql = postgres({
   host: process.env.PGHOST,
   database: process.env.PGDATABASE,
+  username: process.env.PGUSER,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
   ssl: 'require',
   connection: {
-    options: `project=${process.env.ENDPOINT_ID}`,
+    options: `project=${process.env.ENDPOINT_ID}`
   },
 });
 
-// Conectando ao banco de dados PostgreSQL
-client.connect((err) => {
-  if (err) {
-    console.error('Erro ao abrir banco de dados:', err.message);
-  } else {
-    console.log('Conectado ao banco de dados PostgreSQL.');
-    
-    // Criando a tabela purchases se não existir
-    const query = `
+// Criando a tabela purchases se não existir
+(async () => {
+  try {
+    await sql`
       CREATE TABLE IF NOT EXISTS purchases (
         id SERIAL PRIMARY KEY,
         nomeCompleto TEXT,
@@ -33,15 +29,10 @@ client.connect((err) => {
         carroSelecionado TEXT
       );
     `;
-
-    client.query(query, (err) => {
-      if (err) {
-        console.error('Erro ao criar tabela:', err.message);
-      } else {
-        console.log('Tabela purchases criada ou já existe.');
-      }
-    });
+    console.log('Tabela purchases criada ou já existe.');
+  } catch (err) {
+    console.error('Erro ao criar tabela:', err.message);
   }
-});
+})();
 
-module.exports = client;
+module.exports = sql;
