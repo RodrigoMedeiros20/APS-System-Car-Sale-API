@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const db = require('./db');
+const db = require('./db'); // Certifique-se de que db.js está configurado para PostgreSQL
 const helmet = require('helmet');
 
 const app = express();
@@ -29,19 +29,21 @@ app.get('/', (req, res) => {
 });
 
 // Rota POST para salvar os dados de compra
-app.post('/purchase', (req, res) => {
-  const { nomeCompleto, cpf, gmail, telefone, cidade, estado } = req.body;
+app.post('/purchase', async (req, res) => {
+  const { nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado } = req.body;
   console.log('Recebido:', req.body); // Log para depuração
-  const stmt = db.prepare('INSERT INTO purchases (nomeCompleto, cpf, gmail, telefone, cidade, estado) VALUES (?, ?, ?, ?, ?, ?)');
-  stmt.run(nomeCompleto, cpf, gmail, telefone, cidade, estado, function(err) {
-    if (err) {
-      console.error('Erro ao salvar no banco de dados:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    console.log('Dados salvos com sucesso. ID:', this.lastID);
-    res.status(201).json({ id: this.lastID });
-  });
-  stmt.finalize();
+
+  try {
+    const result = await db.query(
+      'INSERT INTO purchases (nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado]
+    );
+    console.log('Dados salvos com sucesso. ID:', result.rows[0].id);
+    res.status(201).json({ id: result.rows[0].id });
+  } catch (err) {
+    console.error('Erro ao salvar no banco de dados:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Iniciando o servidor
