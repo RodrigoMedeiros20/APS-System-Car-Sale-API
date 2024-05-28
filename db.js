@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+const { Client } = require('postgres');
 
 // Configurações de conexão com o PostgreSQL
 const client = new Client({
