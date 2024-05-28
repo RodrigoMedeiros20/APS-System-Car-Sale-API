@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const db = require('./db'); // Certifique-se de que db.js está configurado para PostgreSQL
+const db = require('./db'); // Certifique-se de que db.js está configurado corretamente para PostgreSQL
 const helmet = require('helmet');
 
 const app = express();
@@ -34,12 +34,12 @@ app.post('/purchase', async (req, res) => {
   console.log('Recebido:', req.body); // Log para depuração
 
   try {
-    const result = await db.query(
-      'INSERT INTO purchases (nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      [nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado]
-    );
-    console.log('Dados salvos com sucesso. ID:', result.rows[0].id);
-    res.status(201).json({ id: result.rows[0].id });
+    const result = await db`
+      INSERT INTO purchases (nomeCompleto, cpf, gmail, telefone, cidade, estado, carroSelecionado)
+      VALUES (${nomeCompleto}, ${cpf}, ${gmail}, ${telefone}, ${cidade}, ${estado}, ${carroSelecionado})
+      RETURNING id`;
+    console.log('Dados salvos com sucesso. ID:', result[0].id);
+    res.status(201).json({ id: result[0].id });
   } catch (err) {
     console.error('Erro ao salvar no banco de dados:', err);
     res.status(500).json({ error: err.message });
