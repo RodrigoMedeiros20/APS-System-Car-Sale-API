@@ -7,6 +7,10 @@ const client = new Client({
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
+  ssl: 'require',
+  connection: {
+    options: `project=${process.env.ENDPOINT_ID}`,
+  },
 });
 
 // Conectando ao banco de dados PostgreSQL
